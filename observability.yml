@@ -1,0 +1,5 @@
+---
+- hosts: "localhost"
+  connection: "local"
+  roles:
+    - activate_cockpit_project

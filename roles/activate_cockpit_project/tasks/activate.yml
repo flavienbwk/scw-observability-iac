@@ -1,0 +1,46 @@
+---
+
+- name: Activating a cockpit
+  no_log: true # Not showing keys in logs
+  uri:
+    url: "{{ scw_observability_url }}/activate-cockpit"
+    method: POST
+    return_content: yes
+    headers:
+      X-Auth-Token: "{{ scw_api_key }}"
+    body_format: json
+    body:
+      project_id: "{{ scw_project_id }}"
+    status_code: 200, 409 # 200 is created, 409 is already exists; makes idempotent
+
+- name: Getting cockpit info
+  no_log: true # Not showing keys in logs
+  uri:
+    url: "{{ scw_observability_url }}/cockpit?project_id={{ scw_project_id }}"
+    method: GET
+    return_content: yes
+    headers:
+      X-Auth-Token: "{{ scw_api_key }}"
+    status_code: 200
+  register: activation_info_query
+
+- debug:
+    msg: "{{ activation_info_query.json }}"
+
+- name: "Persist activation details : grafana_url"
+  set_fact: cockpit_grafana_url_fact="{{ activation_info_query.json['endpoints']['grafana_url'] }}"
+
+- name: "Persist activation details : grafana_username"
+  set_fact: cockpit_grafana_username_fact="{{ activation_info_query.json['grafana_username'] }}"
+
+- name: "Persist activation details : grafana_password"
+  set_fact: cockpit_grafana_password_fact="{{ activation_info_query.json['grafana_password'] }}"
+
+- name: "Persist activation details : logs_url"
+  set_fact: cockpit_logs_url_fact="{{ activation_info_query.json['endpoints']['logs_url'] }}"
+
+- name: "Persist activation details : metrics_url"
+  set_fact: cockpit_metrics_url_fact="{{ activation_info_query.json['endpoints']['metrics_url'] }}"
+
+- name: "Persist activation details : alertmanager_url"
+  set_fact: cockpit_alertmanager_url_fact="{{ activation_info_query.json['endpoints']['alertmanager_url'] }}"

@@ -1,0 +1,5 @@
+---
+
+- include_tasks: ./activate.yml
+
+- include_tasks: ./create-push-token.yml

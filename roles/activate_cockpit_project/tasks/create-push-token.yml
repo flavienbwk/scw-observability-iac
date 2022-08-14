@@ -1,0 +1,43 @@
+---
+- name: "Generating random token name"
+  command: echo "token-{{ 999999999999 | random | to_uuid }}"
+  register: token_name
+
+- name: "Persist token details : name"
+  set_fact: cockpit_token_name_fact="{{ token_name.stdout_lines[0] }}"
+
+- name: Creating push token
+  no_log: true # Not showing keys in logs
+  uri:
+    url: "{{ scw_observability_url }}/tokens"
+    method: POST
+    return_content: yes
+    headers:
+      X-Auth-Token: "{{ scw_api_key }}"
+    body_format: json
+    body:
+      project_id: "{{ scw_project_id }}"
+      name: "{{ hostvars['localhost']['cockpit_token_name_fact'] }}"
+      scopes:
+        query_metrics: false
+        write_metrics: true
+        setup_metrics_rules: false
+        query_logs: false
+        write_logs: true
+        setup_logs_rules: false
+        setup_alerts: false
+    status_code: 200, 409
+  register: push_token_result_query
+
+- name: "Persist token details : secret_key"
+  set_fact: cockpit_token_secret_key_fact="{{ push_token_result_query.json['secret_key'] }}"
+  when: push_token_result_query.status == 200 # Appears once only
+- name: "Persist token details : id"
+  set_fact: cockpit_token_id_fact="{{ push_token_result_query.json['id'] }}"
+
+- debug:
+    msg: "Push token name : {{ hostvars['localhost']['cockpit_token_name_fact'] }}"
+- debug:
+    msg: "Push token ID : {{ hostvars['localhost']['cockpit_token_id_fact'] }}"
+- debug:
+    msg: "Push token password : {{ hostvars['localhost']['cockpit_token_secret_key_fact'] }}"
