@@ -9,7 +9,7 @@
 
 - name: Retrieve credential details from file
   vars:
-    scw_cockpit: "{{ lookup('file', './facts.json') | from_json }}"
+    scw_cockpit: "{{ lookup('file', facts_file_path) | from_json }}"
   set_fact:
     scw_cockpit: "{{ scw_cockpit }}"
 

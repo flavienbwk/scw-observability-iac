@@ -1,3 +1,4 @@
 ---
 
 remote_playground_path: "/tmp/scw-cockpit-demo"
+facts_file_path: "./facts.json"
