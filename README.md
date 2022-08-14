@@ -4,7 +4,7 @@ Experimenting Scaleway's observability feature with automation scripts.
 
 ## Presentation
 
-:warning: Observability is currently an [**alpha** feature](https://developers.scaleway.com/en/products/observability/api/v1alpha1). API might be unstable or change quickly.
+:warning: Observability is currently an **alpha** feature. API might be unstable or change quickly.
 
 > Scaleway Observability is a platform to monitor applications and their infrastructure. It ingests metrics, using a Prometheus-like API, and logs, using a Grafana Loki API. It also provides a Grafana Dashboard to visualize the metrics and logs.
 
@@ -15,7 +15,7 @@ Experimenting Scaleway's observability feature with automation scripts.
 
 ## Getting started
 
-In this example, we're going to start a Cockpit instance (observability server), push some logs and visualize them in Grafana.
+In this example inspired from [the official documentation](https://developers.scaleway.com/en/products/observability/api/v1alpha1), we're going to start a Cockpit instance (observability server), push some logs from a Docker container and visualize them in Grafana.
 
 1. Retrieve [your Scaleway credentials](https://console.scaleway.com/project/credentials) and edit the variables file
 
@@ -23,7 +23,7 @@ In this example, we're going to start a Cockpit instance (observability server),
     cp ./vars/main.example.yml ./vars/main.yml
     ```
 
-2. Activate a Cockpit for your project
+2. Activate Cockpit for your project and create a push token
 
     ```bash
     ansible-playbook -i inventories/local.ini ./observability.yml --extra-vars @./vars/main.yml
@@ -31,7 +31,7 @@ In this example, we're going to start a Cockpit instance (observability server),
 
     You should there see the URL, **username** and **password** for your Grafana instance.
 
-    Additionally, you will see your **push token** name and secret.
+    Additionally, you will see your **push token** name and secret. You will need it to push logs to Cockpit.
 
 ## Suggestions & feedbacks for Scaleway team
 
