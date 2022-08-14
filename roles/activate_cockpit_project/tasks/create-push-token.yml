@@ -4,7 +4,11 @@
   register: token_name
 
 - name: "Persist token details : name"
-  set_fact: cockpit_token_name_fact="{{ token_name.stdout_lines[0] }}"
+  vars:
+    role_variables:
+      cockpit_token_name: "{{ token_name.stdout_lines[0] }}"
+  set_fact:
+    scw_cockpit: "{{ scw_cockpit | default({}) | combine(role_variables) }}"
 
 - name: Creating push token
   no_log: true # Not showing keys in logs
@@ -17,7 +21,7 @@
     body_format: json
     body:
       project_id: "{{ scw_project_id }}"
-      name: "{{ hostvars['localhost']['cockpit_token_name_fact'] }}"
+      name: "{{ hostvars['localhost']['scw_cockpit']['cockpit_token_name'] }}"
       scopes:
         query_metrics: false
         write_metrics: true
@@ -30,14 +34,18 @@
   register: push_token_result_query
 
 - name: "Persist token details : secret_key"
-  set_fact: cockpit_token_secret_key_fact="{{ push_token_result_query.json['secret_key'] }}"
+  vars:
+    role_variables:
+      cockpit_token_secret_key: "{{ push_token_result_query.json['secret_key'] }}"
+  set_fact:
+    scw_cockpit: "{{ scw_cockpit | default({}) | combine(role_variables) }}"
   when: push_token_result_query.status == 200 # Appears once only
 - name: "Persist token details : id"
-  set_fact: cockpit_token_id_fact="{{ push_token_result_query.json['id'] }}"
+  vars:
+    role_variables:
+      cockpit_token_id: "{{ push_token_result_query.json['id'] }}"
+  set_fact:
+    scw_cockpit: "{{ scw_cockpit | default({}) | combine(role_variables) }}"
 
 - debug:
-    msg: "Push token name : {{ hostvars['localhost']['cockpit_token_name_fact'] }}"
-- debug:
-    msg: "Push token ID : {{ hostvars['localhost']['cockpit_token_id_fact'] }}"
-- debug:
-    msg: "Push token password : {{ hostvars['localhost']['cockpit_token_secret_key_fact'] }}"
+    msg: "{{ hostvars['localhost']['scw_cockpit'] }}"

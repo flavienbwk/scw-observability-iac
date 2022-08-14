@@ -1,0 +1,53 @@
+---
+- name: Check if docker is installed and working
+  command: docker ps
+  changed_when: False
+
+- name: Check if docker-compose is installed
+  command: docker-compose --version
+  changed_when: False
+
+- name: Retrieve credential details from file
+  vars:
+    scw_cockpit: "{{ lookup('file', './facts.json') | from_json }}"
+  set_fact:
+    scw_cockpit: "{{ scw_cockpit }}"
+
+- name: Prepare playground directory
+  command: "{{ item }}"
+  with_items:
+    - rm -rf "{{ remote_playground_path }}"
+    - mkdir -p "{{ remote_playground_path }}"
+
+- name: Copy role files
+  copy:
+    src: ./
+    dest: "{{ remote_playground_path }}"
+
+- name: Copy Grafana agent example
+  command: cp "{{ remote_playground_path }}/agent-logs-conf-example.yml" "{{ remote_playground_path }}/agent-logs-conf.yml"
+
+- name: Replace Cockpit values in Grafana conf file
+  replace:
+    path: "{{ remote_playground_path }}/agent-logs-conf.yml"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - regexp: 'METRICS_PUSH_URL'
+      replace: "{{ scw_cockpit['cockpit_metrics_url'] }}/api/v1/push"
+    - regexp: 'LOGS_PUSH_URL'
+      replace: "{{ scw_cockpit['cockpit_logs_url'] }}/loki/api/v1/push"
+    - regexp: 'PUSH_TOKEN_ID'
+      replace: "{{ scw_cockpit['cockpit_token_secret_key'] }}"
+
+- name: Run docker configuration
+  shell: "{{ item }}"
+  args:
+    chdir: "{{ remote_playground_path }}"
+  with_items:
+    - docker-compose down
+    - docker-compose up -d
+
+- name: "Enjoy your logs !"
+  debug:
+    msg: "Go to {{ scw_cockpit['cockpit_grafana_url'] }} and identify with credentails : {{ scw_cockpit['cockpit_grafana_username'] }} / {{ scw_cockpit['cockpit_grafana_password'] }}"

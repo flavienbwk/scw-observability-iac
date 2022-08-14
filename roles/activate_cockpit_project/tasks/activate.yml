@@ -27,20 +27,17 @@
 - debug:
     msg: "{{ activation_info_query.json }}"
 
-- name: "Persist activation details : grafana_url"
-  set_fact: cockpit_grafana_url_fact="{{ activation_info_query.json['endpoints']['grafana_url'] }}"
+- name: "Persist activation details"
+  vars:
+    role_variables:
+      cockpit_grafana_url: "{{ activation_info_query.json['endpoints']['grafana_url'] }}"
+      cockpit_grafana_username: "{{ activation_info_query.json['grafana_username'] }}"
+      cockpit_grafana_password: "{{ activation_info_query.json['grafana_password'] }}"
+      cockpit_logs_url: "{{ activation_info_query.json['endpoints']['logs_url'] }}"
+      cockpit_metrics_url: "{{ activation_info_query.json['endpoints']['metrics_url'] }}"
+      cockpit_alertmanager_url: "{{ activation_info_query.json['endpoints']['alertmanager_url'] }}"
+  set_fact:
+    scw_cockpit: "{{ scw_cockpit | default({}) | combine(role_variables) }}"
 
-- name: "Persist activation details : grafana_username"
-  set_fact: cockpit_grafana_username_fact="{{ activation_info_query.json['grafana_username'] }}"
-
-- name: "Persist activation details : grafana_password"
-  set_fact: cockpit_grafana_password_fact="{{ activation_info_query.json['grafana_password'] }}"
-
-- name: "Persist activation details : logs_url"
-  set_fact: cockpit_logs_url_fact="{{ activation_info_query.json['endpoints']['logs_url'] }}"
-
-- name: "Persist activation details : metrics_url"
-  set_fact: cockpit_metrics_url_fact="{{ activation_info_query.json['endpoints']['metrics_url'] }}"
-
-- name: "Persist activation details : alertmanager_url"
-  set_fact: cockpit_alertmanager_url_fact="{{ activation_info_query.json['endpoints']['alertmanager_url'] }}"
+- debug:
+    msg: "{{ hostvars['localhost']['scw_cockpit'] }}"

@@ -1,5 +1,23 @@
 ---
 - hosts: "localhost"
   connection: "local"
+  tags: activation
   roles:
     - activate_cockpit_project
+
+- hosts: "localhost"
+  connection: "local"
+  tags: push-simple-logs
+  vars:
+    push_use_case: "logs"
+  roles:
+    - push_logs_cockpit
+
+# To be developed (official documentation use case)
+# - hosts: "localhost"
+#   connection: "local"
+#   tags: push-metrics-logs
+#   vars:
+#     push_use_case: "metrics"
+#   roles:
+#     - push_logs_cockpit

@@ -1,0 +1,23 @@
+metrics:
+  wal_directory: /tmp/agent
+  global:
+    scrape_interval: 15s
+    remote_write:
+    - url: METRICS_PUSH_URL
+      headers:
+        "X-Token": PUSH_TOKEN_ID
+
+logs:
+  positions_directory: /tmp/positions/
+  configs:
+  - name: scw
+    clients:
+    - url: LOGS_PUSH_URL
+      tenant_id: PUSH_TOKEN_ID
+    scrape_configs:
+    - job_name: varlogs
+      static_configs:
+      - targets: [localhost]
+        labels:
+          job: varlogs
+          __path__: /logs/*

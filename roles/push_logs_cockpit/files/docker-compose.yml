@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+
+  agent:
+    image: grafana/agent:latest
+    restart: always
+    volumes:
+      - "./agent-logs-conf.yml:/etc/agent-config/agent.yaml:ro"
+      - "random_logs:/logs:ro"
+    entrypoint:
+      - /bin/agent
+      - -config.file=/etc/agent-config/agent.yaml
+      - -metrics.wal-directory=/tmp/agent/wal
+
+  logs_producer:
+    image: chentex/random-logger:latest
+    restart: always
+    volumes:
+      - "random_logs:/logs"
+    entrypoint:
+      - /bin/sh
+      - -c
+    command:
+      - "/entrypoint.sh 100 1000 | tee /logs/live.logs"
+
+volumes:
+  random_logs:

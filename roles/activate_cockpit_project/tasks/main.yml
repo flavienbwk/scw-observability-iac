@@ -3,3 +3,8 @@
 - include_tasks: ./activate.yml
 
 - include_tasks: ./create-push-token.yml
+
+- name: "Persist facts variables"
+  copy:
+    dest: ./facts.json
+    content: "{{ hostvars['localhost']['scw_cockpit'] | to_json }}"
