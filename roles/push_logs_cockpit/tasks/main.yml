@@ -19,17 +19,40 @@
     - rm -rf "{{ remote_playground_path }}"
     - mkdir -p "{{ remote_playground_path }}"
 
+
+# Logs only use case
+
 - name: Copy role files
   copy:
-    src: ./
+    src: ./push-simple-logs/
     dest: "{{ remote_playground_path }}"
+  when: push_use_case == "logs"
 
 - name: Copy Grafana agent example
-  command: cp "{{ remote_playground_path }}/agent-logs-conf-example.yml" "{{ remote_playground_path }}/agent-logs-conf.yml"
+  command: cp "{{ remote_playground_path }}/agent-logs-conf-example.yml" "{{ remote_playground_path }}/agent-conf.yml"
+  when: push_use_case == "logs"
+
+# / Logs only use case
+
+
+# Metrics+logs use case
+
+- name: Copy role files
+  copy:
+    src: ./push-metrics-logs/
+    dest: "{{ remote_playground_path }}"
+  when: push_use_case == "metrics"
+
+- name: Copy Grafana agent example
+  command: cp "{{ remote_playground_path }}/agent-metrics-conf-example.yml" "{{ remote_playground_path }}/agent-conf.yml"
+  when: push_use_case == "metrics"
+
+# / Metrics+logs use case
+
 
 - name: Replace Cockpit values in Grafana conf file
   replace:
-    path: "{{ remote_playground_path }}/agent-logs-conf.yml"
+    path: "{{ remote_playground_path }}/agent-conf.yml"
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
   with_items:

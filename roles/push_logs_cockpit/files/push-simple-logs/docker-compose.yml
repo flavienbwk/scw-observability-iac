@@ -6,7 +6,7 @@ services:
     image: grafana/agent:latest
     restart: always
     volumes:
-      - "./agent-logs-conf.yml:/etc/agent-config/agent.yaml:ro"
+      - "./agent-conf.yml:/etc/agent-config/agent.yaml:ro"
       - "random_logs:/logs:ro"
     entrypoint:
       - /bin/agent

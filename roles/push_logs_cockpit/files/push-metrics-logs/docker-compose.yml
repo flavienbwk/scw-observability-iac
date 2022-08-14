@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+
+  agent:
+    image: grafana/agent:latest
+    restart: always
+    volumes:
+      - "./agent-conf.yml:/etc/agent-config/agent.yaml:ro"
+      - "var_log_dir:/var/log:ro"
+      - "/sys:/host/sys:ro,rslave"
+      - "/proc:/host/proc:ro,rslave"
+      - "random_logs:/logs:ro"
+    entrypoint:
+      - /bin/agent
+      - -config.file=/etc/agent-config/agent.yaml
+      - -metrics.wal-directory=/tmp/agent/wal
+    depends_on:
+      - logs_producer
+    pid: "host"
+
+  logs_producer:
+    image: chentex/random-logger:latest
+    restart: always
+    volumes:
+      - "var_log_dir:/var/log"
+      - "random_logs:/logs"
+    entrypoint:
+      - /bin/sh
+      - -c
+    command:
+      - "/entrypoint.sh 100 1000 | tee /logs/live.logs"
+
+volumes:
+  random_logs:
+  var_log_dir:

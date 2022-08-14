@@ -13,11 +13,10 @@
   roles:
     - push_logs_cockpit
 
-# To be developed (official documentation use case)
-# - hosts: "localhost"
-#   connection: "local"
-#   tags: push-metrics-logs
-#   vars:
-#     push_use_case: "metrics"
-#   roles:
-#     - push_logs_cockpit
+- hosts: "localhost"
+  connection: "local"
+  tags: push-metrics-logs
+  vars:
+    push_use_case: "metrics"
+  roles:
+    - push_logs_cockpit
